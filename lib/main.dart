@@ -53,55 +53,52 @@ class MyAppState extends ChangeNotifier{
 }
 
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
 
+class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context){
-    var appState = context.watch<MyAppState>();
-    var idea = appState.current;
-    IconData icon;
-
-
-     if(appState.favoritos.contains(idea)){
-        icon = Icons.favorite;  
-     } else {
-        icon = Icons.favorite_border_outlined;
-     }
-
-
-
-
-
+  
 
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(idea: appState.current),
-            SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(onPressed: () {
-                  appState.toggleFavorito();
-                },
-                icon: Icon(icon),
-                label: Text('Me Gusta'),
-                ),
-                SizedBox(width: 10.0),
-                ElevatedButton(onPressed: () {
-                  appState.getSiguiente();
-                },
-                child: Text('Siguiente'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+       body: Row(
+        children: [
+          SafeArea(
+          child: NavigationRail(
+            extended:false,
+            destinations: [
+              NavigationRailDestination(
+                icon: Icon(Icons.home), 
+                label: Text("Inicio")),
+                NavigationRailDestination(
+                icon: Icon(Icons.favorite), 
+                label: Text("Favoritos")),
+            ],
+            selectedIndex: 0,
+            onDestinationSelected: (value){
+              setState(() {
+                selectedIndex=Value;
+              });
+            }
+          
+
+
+          )
+          
+          ),
+          Expanded(
+            child:Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ))
+
+      ],)
+ 
     );
   }
 }
@@ -132,6 +129,50 @@ class BigCard extends StatelessWidget {
         ),
 
 
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget{
+  @override 
+  Widget build(BuildContext context){
+      var appState = context.watch<MyAppState>();
+    var idea = appState.current;
+    IconData icon;
+
+
+     if(appState.favoritos.contains(idea)){
+        icon = Icons.favorite;  
+     } else {
+        icon = Icons.favorite_border_outlined;
+     }
+    return  Scaffold(    
+    body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BigCard(idea: appState.current),
+            SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(onPressed: () {
+                  appState.toggleFavorito();
+                },
+                icon: Icon(icon),
+                label: Text('Me Gusta'),
+                ),
+                SizedBox(width: 10.0),
+                ElevatedButton(onPressed: () {
+                  appState.getSiguiente();
+                },
+                child: Text('Siguiente'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
