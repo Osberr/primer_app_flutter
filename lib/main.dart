@@ -170,3 +170,27 @@ class GeneratorPage extends StatelessWidget {
     );
   }
 }
+
+class favoritosPage extends StatelessWidget{
+  @override
+  Widget build(BuildContext context){
+    var appState = context.watch<MyAppState>();
+    if (appState.favoritos.isEmpty){
+    return Center(child: Text("Aun hay favoritos"),);
+    }
+
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text("Se han elegido ${appState.favoritos.length} favoritos"),
+        ),
+        for (var name in appState.favoritos)
+        ListTile(
+          leading: Icon(Icons.favorite),
+          title: Text(name.asLowerCase),
+        )
+      ],
+    );
+  }
+}
