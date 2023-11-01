@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:provider/provider.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +16,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme:
+              ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 204, 65, 55)),
           useMaterial3: true,
         ),
         home: const MyHomePage(),
@@ -28,22 +26,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-class MyAppState extends ChangeNotifier{
+class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
-
-
-  var favoritos = <WordPair> [];
-
+  var favoritos = <WordPair>[];
 
   void getSiguiente() {
     current = WordPair.random();
     notifyListeners();
   }
 
-
-  void toggleFavorito(){
-    if(favoritos.contains(current)){
+  void toggleFavoritos() {
+    if (favoritos.contains(current)) {
       favoritos.remove(current);
     } else {
       favoritos.add(current);
@@ -51,7 +44,6 @@ class MyAppState extends ChangeNotifier{
     notifyListeners();
   }
 }
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -61,62 +53,65 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var selectedIndex = 0;
   @override
-  Widget build(BuildContext context){
-  
+  Widget build(BuildContext context) {
+    Widget page;
+    switch(selectedIndex){
+      case 0: page = GeneratorPage();break;
+      case 1: page = Placeholder();break;
+      default: 
+        throw UnimplementedError("No hay un widget para: $selectedIndex");
+    }
 
+    return LayoutBuilder(
+      builder:(context, constraints){
+        
+     
     return Scaffold(
-       body: Row(
+      body: Row(
         children: [
           SafeArea(
-          child: NavigationRail(
-            extended:false,
-            destinations: [
-              NavigationRailDestination(
-                icon: Icon(Icons.home), 
-                label: Text("Inicio")),
+            child: NavigationRail(
+              extended: constraints.maxWidth >= 600,
+              destinations: [
                 NavigationRailDestination(
-                icon: Icon(Icons.favorite), 
-                label: Text("Favoritos")),
-            ],
-            selectedIndex: 0,
-            onDestinationSelected: (value){
-              setState(() {
-                selectedIndex=Value;
-              });
-            }
-          
-
-
-          )
-          
+                    icon: Icon(Icons.home), label: Text("Inicio")),
+                NavigationRailDestination(
+                    icon: Icon(Icons.favorite), label: Text("Favoritos"))
+              ],
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                setState(() {
+                  selectedIndex = value;
+                });
+              },
+            ),
           ),
           Expanded(
-            child:Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: GeneratorPage(),
-            ))
-
-      ],)
- 
+              child: Container(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: page,
+          )),
+        ],
+      ),
+    );
+     }
     );
   }
 }
 
-
-class BigCard extends StatelessWidget {
+class Bigcard extends StatelessWidget {
   final WordPair idea;
-  const BigCard({
-    super.key,
-    required this.idea
-  });
 
+  const Bigcard({super.key, required this.idea});
 
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
-    final textStyle = tema.textTheme.displayMedium!.copyWith(color:  tema.colorScheme.onPrimary);
-
+    final textStyle = tema.textTheme.displayMedium!.copyWith(
+      color: tema.colorScheme.onPrimary,
+    );
 
     return Card(
       color: tema.colorScheme.primary,
@@ -125,54 +120,52 @@ class BigCard extends StatelessWidget {
         child: Text(
           idea.asLowerCase,
           style: textStyle,
-          semanticsLabel: "${idea.first} ${idea.second}", //se leera cla palabra
+          semanticsLabel: "${idea.first} ${idea.second}",
         ),
-
-
       ),
     );
   }
 }
 
-class GeneratorPage extends StatelessWidget{
-  @override 
-  Widget build(BuildContext context){
-      var appState = context.watch<MyAppState>();
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
     var idea = appState.current;
     IconData icon;
-
-
-     if(appState.favoritos.contains(idea)){
-        icon = Icons.favorite;  
-     } else {
-        icon = Icons.favorite_border_outlined;
-     }
-    return  Scaffold(    
-    body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(idea: appState.current),
-            SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(onPressed: () {
-                  appState.toggleFavorito();
-                },
-                icon: Icon(icon),
-                label: Text('Me Gusta'),
-                ),
-                SizedBox(width: 10.0),
-                ElevatedButton(onPressed: () {
-                  appState.getSiguiente();
-                },
-                child: Text('Siguiente'),
-                ),
-              ],
-            ),
-          ],
-        ),
+    if (appState.favoritos.contains(idea)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_outline;
+    }
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Bigcard(idea: (appState.current)),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavoritos();
+                  },
+                  icon: Icon(icon),
+                  label: Text("Me gusta")),
+              SizedBox(
+                width: 10,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    appState.getSiguiente();
+                  },
+                  child: Text("Siguiente")),
+            ],
+          )
+        ],
       ),
     );
   }
